@@ -7,7 +7,7 @@ export default function AuthForm() {
   const toggleForm = () => {
     setIsLogin(!isLogin);
   };
-
+//STATE FOR REGISTER DATA
    const [registerdata, setdata] = useState({
         username: "",
         email: "",
@@ -18,11 +18,56 @@ export default function AuthForm() {
         year: "",
         domain:""
    })
-    
-    function registerUser()
-    {
-        console.log(registerUser);
+//STATE FOR LOGIN FORM
+  const [logindata, setLoginData] = useState({
+    username: "",
+    password: ""
+  });
+  //REGISTER FUNCTION
+  async function registerUser(e) {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://127.0.0.1:8000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(registerdata),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail);
+      }
+
+      alert(data.message); // User registered successfully
+      setIsLogin(true); // Switch to login after successful registration
+    } catch (error) {
+      alert("Error: " + error.message);
     }
+  }
+//LOGIN FUNCTION
+ async function loginUser(e) {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://127.0.0.1:8000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(logindata),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail);
+      }
+
+      console.log("✅", data.message);
+      alert(data.message); // Login successful
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 p-4">
       <motion.div
@@ -79,13 +124,16 @@ export default function AuthForm() {
                   transition={{ duration: 0.4 }}
                   className="space-y-4"
                 >
-                  <InputBox placeholder="Username" type="text" />
-                  <InputBox placeholder="Password" type="password" />
+                 {/* passed props for login input*/}
+                <InputBox placeholder="Username" type="text" registerdata={logindata} setdata={setLoginData} name="username" />
+                <InputBox placeholder="Password" type="password" registerdata={logindata} setdata={setLoginData} name="password" />
+
                   <div className="text-right">
                     <a href="#" className="text-sm text-blue-600 hover:underline">
                       Forgot password?
                     </a>
                   </div>
+                
                   <button
                     type="submit"
                     className="w-full py-3 rounded-xl text-gray-700 font-semibold mt-4 transition-all duration-300"
@@ -101,6 +149,8 @@ export default function AuthForm() {
                       e.currentTarget.style.boxShadow = 
                         "8px 8px 16px #a3b1c6, -8px -8px 16px #ffffff";
                     }}
+                    //added onclick event here
+                    onClick={loginUser}
                   >
                     Login
                   </button>
@@ -141,7 +191,7 @@ export default function AuthForm() {
                 
                 <button
                                   type="submit"
-                                    onClick={()=>{console.log(registerdata)}}
+                                    onClick={registerUser}
                   className="w-full py-3 rounded-xl text-gray-700 font-semibold mt-6 transition-all duration-300"
                   style={{
                     background: "#e0e5ec",
